@@ -8,6 +8,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
       - name: Display welcome message
         run: echo "Hello from GitHub Actions!"
 
@@ -16,3 +19,6 @@ jobs:
 
       - name: Display current directory
         run: pwd
+
+      - name: List repository files
+        run: ls -la
