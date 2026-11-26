@@ -1,0 +1,36 @@
+
+name: Day 4 - Linux Continue on Error
+
+on:
+  workflow_dispatch:
+
+jobs:
+  linux_system_check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check hostname
+        run: hostname
+
+      - name: Check disk usage
+        run: df -h
+
+      - name: Check memory
+        run: free -h
+
+      - name: Check optional package
+        id: package_check
+        continue-on-error: true
+        run: dpkg -s nginx-custom-package
+
+      - name: Display package check result
+        if: always()
+        run: |
+          echo "Actual outcome: ${{ steps.package_check.outcome }}"
+          echo "Final conclusion: ${{ steps.package_check.conclusion }}"
+
+      - name: Check kernel information
+        run: uname -a
+
+      - name: Check running processes
+        run: ps aux
