@@ -1,0 +1,61 @@
+
+name: Day 4 - Nginx Status Check
+
+on:
+  workflow_dispatch:
+
+jobs:
+  nginx_check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Update package information
+        run: |
+          sudo apt-get update
+
+      - name: Install Nginx
+        run: |
+          sudo apt-get install -y nginx
+
+      - name: Verify Nginx installation
+        run: |
+          nginx -v
+          dpkg -l nginx
+
+      - name: Verify Nginx service
+        run: |
+          systemctl is-active nginx
+
+  success_report:
+    runs-on: ubuntu-latest
+    needs: nginx_check
+    if: success()
+
+    steps:
+      - name: Successful installation report
+        run: |
+          echo "Nginx installation and verification succeeded"
+          date
+
+  failure_report:
+    runs-on: ubuntu-latest
+    needs: nginx_check
+    if: failure()
+
+    steps:
+      - name: Failure report
+        run: |
+          echo "Nginx installation or verification failed"
+          date
+
+  final_report:
+    runs-on: ubuntu-latest
+    needs: nginx_check
+    if: always()
+
+    steps:
+      - name: Final execution report
+        run: |
+          echo "Nginx verification workflow finished"
+          hostname
+          date
