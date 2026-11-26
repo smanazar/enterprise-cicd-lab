@@ -1,20 +1,25 @@
-name: My First GitHub Actions Workflow
+
+name: AWS Environment Configuration Lab
 
 on:
   workflow_dispatch:
 
+env:
+  AWS_ENVIRONMENT: dev
+  AWS_REGION: us-east-2
+  AWS_SERVICE: ec2
+
 jobs:
-  first_job:
+  aws_configuration:
+    name: Display AWS Configuration
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Display welcome message
-        run: echo "Hello from GitHub Actions!"
+        run: echo "Welcome to AWS GitHub Actions Lab"
 
       - name: Display Linux hostname
         run: hostname
@@ -24,3 +29,17 @@ jobs:
 
       - name: List repository files
         run: ls -la
+
+      - name: Display AWS configuration
+        run: |
+          echo "AWS Environment: $AWS_ENVIRONMENT"
+          echo "AWS Region: $AWS_REGION"
+          echo "AWS Service: $AWS_SERVICE"
+
+      - name: Verify AWS configuration
+        run: |
+          if [ "$AWS_ENVIRONMENT" = "dev" ]; then
+            echo "Development environment selected"
+          else
+            echo "Different environment selected"
+          fi
