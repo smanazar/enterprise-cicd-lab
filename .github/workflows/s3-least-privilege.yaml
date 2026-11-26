@@ -1,0 +1,83 @@
+
+name: AWS S3 Least Privilege Lab
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-2
+  S3_BUCKET: github-actions-least-privilege-852736928321
+
+jobs:
+  s3-least-privilege:
+    name: Test S3 IAM Permissions
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to AWS using OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::852736928321:role/GitHubActions-Dev-Role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Verify AWS identity
+        run: |
+          aws sts get-caller-identity
+
+      - name: Test allowed S3 listing
+        run: |
+          aws s3api list-objects-v2 \
+            --bucket "$S3_BUCKET" \
+            --output table
+
+      - name: Test allowed S3 object reading
+        run: |
+          aws s3 cp \
+            "s3://$S3_BUCKET/test.txt" \
+            downloaded-test.txt
+
+          cat downloaded-test.txt
+
+      - name: Test denied S3 upload
+        run: |
+          echo "Unauthorized upload test" > denied-upload.txt
+
+          if aws s3 cp denied-upload.txt \
+            "s3://$S3_BUCKET/denied-upload.txt" \
+            2>error.log; then
+
+            echo "ERROR: Upload unexpectedly succeeded"
+            exit 1
+          else
+            if grep -q "AccessDenied" error.log; then
+              echo "SUCCESS: Upload denied as expected"
+            else
+              cat error.log
+              exit 1
+            fi
+          fi
+
+      - name: Test denied S3 deletion
+        run: |
+          if aws s3api delete-object \
+            --bucket "$S3_BUCKET" \
+            --key must-not-exist-delete-probe.txt \
+            2>error.log; then
+
+            echo "ERROR: Delete permission unexpectedly succeeded"
+            exit 1
+          else
+            if grep -q "AccessDenied" error.log; then
+              echo "SUCCESS: Delete denied as expected"
+            else
+              cat error.log
+              exit 1
+            fi
+          fi
