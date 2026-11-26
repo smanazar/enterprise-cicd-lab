@@ -1,29 +1,28 @@
-name: AWS GitHub OIDC Authentication Lab
+
+name: Day 4 - Job Outputs
 
 on:
   workflow_dispatch:
 
-permissions:
-  id-token: write
-  contents: read
-
-env:
-  AWS_REGION: us-east-2
-
 jobs:
-  aws_oidc_authentication:
-    name: Authenticate to AWS using OIDC
+  detect_environment:
     runs-on: ubuntu-latest
 
+    outputs:
+      environment_name: ${{ steps.config.outputs.environment_name }}
+
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v4
+      - name: Set environment
+        id: config
+        run: |
+          echo "environment_name=development" >> "$GITHUB_OUTPUT"
 
-      - name: Configure AWS credentials using OIDC
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::852736928321:role/GitHubActions-Dev-Role
-          aws-region: ${{ env.AWS_REGION }}
+  deploy:
+    runs-on: ubuntu-latest
+    needs: detect_environment
 
-      - name: Verify AWS identity
-        run: aws sts get-caller-identity
+    steps:
+      - name: Display environment
+        run: |
+          echo "Deploying to: ${{ needs.detect_environment.outputs.environment_name }}"
+
