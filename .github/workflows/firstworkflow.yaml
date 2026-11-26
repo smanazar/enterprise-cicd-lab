@@ -1,45 +1,29 @@
-
-name: AWS Environment Configuration Lab
+name: AWS GitHub OIDC Authentication Lab
 
 on:
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+
 env:
-  AWS_ENVIRONMENT: dev
   AWS_REGION: us-east-2
-  AWS_SERVICE: ec2
 
 jobs:
-  aws_configuration:
-    name: Display AWS Configuration
+  aws_oidc_authentication:
+    name: Authenticate to AWS using OIDC
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Display welcome message
-        run: echo "Welcome to AWS GitHub Actions Lab"
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::852736928321:role/GitHubActions-Dev-Role
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Display Linux hostname
-        run: hostname
-
-      - name: Display current directory
-        run: pwd
-
-      - name: List repository files
-        run: ls -la
-
-      - name: Display AWS configuration
-        run: |
-          echo "AWS Environment: $AWS_ENVIRONMENT"
-          echo "AWS Region: $AWS_REGION"
-          echo "AWS Service: $AWS_SERVICE"
-
-      - name: Verify AWS configuration
-        run: |
-          if [ "$AWS_ENVIRONMENT" = "dev" ]; then
-            echo "Development environment selected"
-          else
-            echo "Different environment selected"
-          fi
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
