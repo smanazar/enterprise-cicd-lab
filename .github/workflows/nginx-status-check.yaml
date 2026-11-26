@@ -22,9 +22,24 @@ jobs:
           nginx -v
           dpkg -l nginx
 
+      - name: Check Nginx status before starting
+        run: |
+          sudo systemctl status nginx --no-pager || true
+
+      - name: Start Nginx
+        run: |
+          sudo systemctl start nginx
+          sleep 2
+
       - name: Verify Nginx service
         run: |
           systemctl is-active nginx
+
+      - name: Troubleshoot Nginx
+        if: failure()
+        run: |
+          sudo systemctl status nginx --no-pager || true
+          sudo journalctl -u nginx -n 30 --no-pager || true
 
   success_report:
     runs-on: ubuntu-latest
@@ -36,6 +51,7 @@ jobs:
         run: |
           echo "Nginx installation and verification succeeded"
           date
+          hostname
 
   failure_report:
     runs-on: ubuntu-latest
@@ -47,6 +63,7 @@ jobs:
         run: |
           echo "Nginx installation or verification failed"
           date
+          hostname
 
   final_report:
     runs-on: ubuntu-latest
