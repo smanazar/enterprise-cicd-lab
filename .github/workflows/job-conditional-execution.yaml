@@ -10,8 +10,8 @@ jobs:
     steps:
       - name: Validate configuration
         run: |
-          echo "Validating configuration..."
-          echo "Validation successful"
+          pwd                                  
+          df 
 
   deploy:
     runs-on: ubuntu-latest
