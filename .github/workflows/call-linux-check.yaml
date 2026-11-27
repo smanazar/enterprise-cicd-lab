@@ -1,0 +1,10 @@
+
+name: Call Reusable Linux Check
+
+on:
+  workflow_dispatch:
+
+jobs:
+  system_validation:
+    uses: ./.github/workflows/reusable-linux-check.yaml
+

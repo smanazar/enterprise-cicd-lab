@@ -1,0 +1,22 @@
+
+name: Reusable Linux System Check
+
+on:
+  workflow_call:
+
+jobs:
+  linux_check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check hostname
+        run: hostname
+
+      - name: Check kernel
+        run: uname -r
+
+      - name: Check disk space
+        run: df -h
+
+      - name: Check memory
+        run: free -h
