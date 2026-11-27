@@ -1,0 +1,36 @@
+name: Day 4 - Matrix Fail Fast
+
+on:
+  workflow_dispatch:
+
+jobs:
+  linux_validation:
+    name: Linux check - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-22.04
+          - ubuntu-24.04
+          - ubuntu-latest
+
+    steps:
+      - name: Display runner information
+        run: |
+          echo "Operating system: ${{ matrix.os }}"
+          hostname
+          uname -r
+
+      - name: Check disk space
+        run: df -h
+
+      - name: Check optional service
+        run: |
+          if [ "${{ matrix.os }}" = "ubuntu-24.04" ]; then
+            echo "Simulating a failed validation on Ubuntu 24.04"
+            exit 1
+          fi
+
+          echo "Validation successful"
