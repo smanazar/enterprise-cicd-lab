@@ -1,0 +1,30 @@
+
+name: Day 4 - Linux Matrix Strategy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  linux_validation:
+    name: Linux validation - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os:
+          - ubuntu-22.04
+          - ubuntu-24.04
+
+    steps:
+      - name: Check hostname
+        run: hostname
+
+      - name: Check operating system
+        run: cat /etc/os-release
+
+      - name: Check kernel
+        run: uname -r
+
+      - name: Check disk usage
+        run: df -h
+
