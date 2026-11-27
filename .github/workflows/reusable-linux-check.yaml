@@ -3,19 +3,25 @@ name: Reusable Linux System Check
 
 on:
   workflow_call:
+    inputs:
+      environment_name:
+        description: "Target environment"
+        required: true
+        type: string
 
 jobs:
   linux_check:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Display environment
+        run: |
+          echo "Running Linux checks for: ${{ inputs.environment_name }}"
+
       - name: Check hostname
         run: hostname
 
-      - name: Check kernel
-        run: uname -r
-
-      - name: Check disk space
+      - name: Check disk
         run: df -h
 
       - name: Check memory

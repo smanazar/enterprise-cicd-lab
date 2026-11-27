@@ -7,4 +7,6 @@ on:
 jobs:
   system_validation:
     uses: ./.github/workflows/reusable-linux-check.yaml
+    with:
+      environment_name: PRD
 
